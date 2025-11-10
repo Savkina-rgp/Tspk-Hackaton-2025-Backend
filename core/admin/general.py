@@ -1,7 +1,7 @@
 from django.utils.safestring 	import mark_safe
 from django.contrib 			import admin
 
-from adminsortable.admin import SortableAdmin
+from adminsortable2.admin import SortableAdminMixin
 
 from shared.string_processing.resizing 	import truncate_string
 from shared.admin.model_registration 	import AdminModelRegistrator
@@ -33,8 +33,8 @@ class ExtraContextInline(admin.TabularInline):
 	extra = 0
 
 @registrator.set_for_model(models.Page)
-class PageAdmin(SortableAdmin, BaseRenderableModelAdmin):
-	list_display = ('page', 'slug', 'order', 'view_on_site_link', 'page_template_name', 'is_generic_page',)
+class PageAdmin(SortableAdminMixin, BaseRenderableModelAdmin):
+	list_display = ('page', 'slug', 'view_on_site_link', 'page_template_name', 'is_generic_page',)
 	inlines = [ExtraContextInline]
 	prepopulated_fields = {}
 
