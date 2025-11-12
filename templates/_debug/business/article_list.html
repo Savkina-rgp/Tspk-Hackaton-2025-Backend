@@ -1,0 +1,22 @@
+{% extends 'core/generic/model_list.html' %}
+
+
+{% block list-item %}
+	{% include 'business/components/article_card.html' %}
+{% endblock %}
+
+{% block list-content %}
+	<form method="get" class="hidden" style="flex-direction: row;">
+		<button type="submit" name="category" value=""
+				class="{% if not request.GET.category %}current{% endif %}">
+			Все статьи
+		</button>
+
+		{% for category in article_categories %}
+			<button type="submit" name="category" value="{{ category.pk }}"
+					class="{% if request.GET.category == category.pk|stringformat:'i' %}current{% endif %}">
+				{{ category.name }}
+			</button>
+		{% endfor %}
+	</form>
+{% endblock %}

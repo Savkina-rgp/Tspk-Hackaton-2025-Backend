@@ -1,0 +1,18 @@
+{% extends 'components/item_card.html' %}
+
+{% block body %}
+	<div class="sc-flex-column" style="width: 100%; height: 100%; gap: 0.5rem;">
+		<div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+			<span class="dim">{{ obj.publish_date|date:"d.m.Y" }}</span>
+			<span>{{ obj.category }}</span>
+		</div>
+		<div style="
+			display: -webkit-box;
+			line-clamp: 3;
+			-webkit-line-clamp: 3;
+			overflow: hidden;
+			-webkit-box-orient: vertical;">
+			{{ obj.name }}
+		</div>
+	</div>
+{% endblock %}

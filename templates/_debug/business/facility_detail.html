@@ -1,0 +1,31 @@
+{% extends 'core/generic/model_detail.html' %}
+
+{% block special_content %}
+<table>
+	<tr>
+		<td>Площадь стекла</td>
+		<td>{{object.glass_area}}</td>
+	</tr>
+	<tr>
+		<td>Краткое описание</td>
+		<td>{{object.small_description}}</td>
+	</tr>
+	<tr>
+		<td>Город</td>
+		<td>{{object.city}}</td>
+	</tr>
+	<tr>
+		<td>Год начала работ по остеклению</td>
+		<td>{{object.glazing_starts_year}}</td>
+	</tr>
+	<tr>
+		<td>Год окончания работ по остеклению</td>
+		<td>{{object.glazing_ends_year}}</td>
+	</tr>
+</table>
+
+Следущий проект:
+<div class="list-container flex">
+	{% include 'business/components/facility_card.html' with obj=next_facility %}
+</div>
+{% endblock %}

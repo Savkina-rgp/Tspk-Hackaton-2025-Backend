@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+	<h3>Условный хедер</h3>
+	<div class="header">
+		{% for gpage in global.pages.values %}
+			{% if gpage.add_to_header %}
+			{% with is_current=page|default:None|is_equal:gpage %}
+			<a class="{% if is_current %}current{% endif %} oneline-text add-sounds"
+				style="text-align: left;"
+				title="{{ gpage.name }}"
+				{% if not is_current %}href="{{gpage.get_absolute_url}}"{%endif%}>
+				{{ gpage.name }}
+			</a>
+			{% endwith %}
+			{%endif%}
+		{% endfor %}
+	</div>
+</div>
+<style>
+	.header {
+		background-color: var(--lighting-1);
+		border: 1px solid var(--lighting-2);
+		padding: 0.5rem;
+	}
+</style>
+{% endblock %}

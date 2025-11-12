@@ -1,0 +1,72 @@
+{% extends 'core/generic/model_detail.html' %}
+
+{% block special_content %}
+{% with characteristics=object.characteristics.all %}
+	{% if characteristics %}
+		<div style="display: flex; flex-direction: column; align-items: flex-start;">
+			<table>
+				<tr>
+					<th>Тип</th>
+					<th>Значение</th>
+				</tr>
+				{% for characteristic in characteristics %}
+				<tr>
+					<td>{{characteristic.type}}</td>
+					<td>{{characteristic.value}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+	{% endif %}
+{% endwith %}
+
+{% with facilities=object.used_in_facilities.all %}
+	<div>
+	{% if facilities %}
+		<h3>Используется в проектах</h3>
+		<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+			{% for facility in facilities %}
+				{% include 'business/components/facility_card.html' with obj=facility %}
+			{% endfor %}
+		</div>
+	{% else %}
+		<h3>Не используется в продуктах</h3>
+	{% endif %}
+	</div>
+{% endwith %}
+
+<div>
+	<h3>Другие продукты</h3>
+	<div class="list-container flex">
+		{% for product in other_products %}
+			{% include 'business/components/product_card.html' with obj=product %}
+		{% endfor %}
+	</div>
+</div>
+
+{% with documents=object.documents.all %}
+	{% if documents %}
+		<div>
+			<table>
+				<thead>
+					<tr>
+						<th>Файл</th>
+						<th>Размер</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for document in documents %}
+					<tr>
+						<td>📑 <a class="underlined-on-hover add-sounds" href="{{document.file.url}}">{{document}}</a></td>
+						<td>{{document.file.size|filesizeformat}}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% endif %}
+{% endwith %}
+
+<div style="height: 1rem;"></div>
+{% include 'components/feedback_request_form.html' %}
+{% endblock %}

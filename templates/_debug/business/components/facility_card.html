@@ -1,0 +1,15 @@
+<a href="{{obj.get_absolute_url}}" class="button facility-item-card">
+	<img src="{{obj.primary_image.get_url}}" class="main-image">
+	<div class="body">
+		<div>{{obj.name}}</div>
+		<div>{{obj.city}}</div>
+		{% if obj.small_description %}
+			<div>{{obj.small_description}}</div>
+		{% endif %}
+		<div class="product-icons">
+			{% for product in obj.used_products.all %}
+				<img src="{{product.type_icon.url}}">
+			{% endfor %}
+		</div>
+	</div>
+</a>

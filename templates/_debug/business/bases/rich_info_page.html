@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header">
+	{% for gpage in global.pages.values %}
+		{% if gpage.add_to_header %}
+		{% with is_current=page|default:None|is_equal:gpage %}
+		<a class="button {% if is_current %}current{% endif %} oneline-text add-sounds"
+			style="text-align: left;"
+			title="{{ gpage.name }}"
+			{% if not is_current %}href="{{gpage.get_absolute_url}}"{%endif%}>
+			{{ gpage.name }}
+		</a>
+		{% endwith %}
+		{%endif%}
+	{% endfor %}
+</div>
+<div class="company-images-block">
+	<img
+		src="{{images.1.image.url}}"
+		alt="{{images.1.get_image_alt_text}}"
+		class="main-image">
+
+		<div class="images-scroll">
+			{% for image in images %}
+				<img src="{{image.get_url}}" alt="{{image.get_image_alt_text}}">
+			{% endfor %}
+		</div>
+</div>
+<h1 style="text-align: center;">{{ years_old }} лет на рынке</h1>
+<div class="products-row list-container flex">
+	{% for obj in products %}
+		{% include 'business/components/product_card.html' %}
+	{% endfor %}
+</div>
+<div class="products-row list-container flex">
+	{% for obj in facilities %}
+		{% include 'business/components/facility_card.html' %}
+	{% endfor %}
+</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem;">
+	{% for obj in parthners %}
+		<img src="{{obj.image.url}}" alt="{{obj.get_image_alt_text}}"
+			style="width: 8rem; aspect-ratio: 1; object-fit: cover; border: 1px solid var(--lighting-2); border-radius: 1rem;">
+	{% endfor %}
+</div>
+<style>
+.header {
+	border-radius: 0.5rem;
+	padding: 0.5rem;
+	display: flex;
+	gap: 0.5rem;
+	justify-content: center;
+
+	.button.current {
+		color: rgb(80, 156, 255);
+	}
+	.button:first-child {
+		border-top-left-radius: var(--elements-border-radius);
+		border-bottom-left-radius: var(--elements-border-radius);
+	}
+	.button:last-child {
+		border-top-right-radius: var(--elements-border-radius);
+		border-bottom-right-radius: var(--elements-border-radius);
+	}
+}
+.company-images-block {
+	padding-top: 1rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	flex-shrink: 0;
+	max-width: 100%;
+	min-height: 0;
+	gap: 1rem;
+
+	.main-image {
+		border-radius: 0.5rem;
+		object-fit: cover;
+		aspect-ratio: 2;
+		width: 80%;
+		flex-shrink: 0;
+		border: 1px solid var(--lighting-2);
+	}
+
+	.images-scroll {
+		overflow-y: hidden;
+		display: flex;
+		max-width: 70vw;
+		gap: 1rem;
+
+		img {
+			border-radius: 0.6rem;
+			object-fit: cover;
+			width: 16rem;
+			height: 10rem;
+			flex-grow: 0;
+			flex-shrink: 0;
+		}
+	}
+}
+
+.products-row {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	flex-grow: 1;
+	padding-block: 1rem;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 style="text-align: center;">{{page_info.get_h1}}</h1>
+<table>
+	<thead>
+		<tr>
+			<th>ФИО и должность</th>
+			<th>Номер телефона</th>
+			<th>Почта</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for contact in contacts %}
+			<tr>
+				<td>
+					<div>{{contact.full_name}}</div>
+					<div class="dim">{{contact.position}}</div>
+				</td>
+				<td>
+					<div>
+						{% for phonenumber in contact.phonenumbers.all %}
+							<div>{{phonenumber}}</div>
+						{% endfor %}
+					</div>
+				</td>
+				<td>
+					<div>
+						{% for email in contact.emails.all %}
+							<div>{{email}}</div>
+						{% endfor %}
+					</div>
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+<style>
+	main {
+		padding-bottom: 12rem;
+		width: 65vw;
+		margin-inline: auto;
+	}
+</style>
+{% endblock %}

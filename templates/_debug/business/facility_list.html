@@ -1,0 +1,16 @@
+{% extends 'core/generic/model_list.html' %}
+
+{% block list-item %}
+	{% include 'business/components/facility_card.html' %}
+{% endblock %}
+
+{% block list-content %}
+<div style="display: flex; justify-content: flex-start;">
+	<form method="get">
+		<table>
+			{{ filter.form.as_table }}
+		</table>
+		<button type="submit">Применить фильтры</button>
+	</form>
+</div>
+{% endblock %}

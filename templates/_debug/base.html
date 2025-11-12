@@ -43,18 +43,21 @@
 	{% endif %}{% endwith %}
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-	<script>{{ global.site_settings.head_script|safe }}</script>
+	<!-- {{ global.site_settings.head_addition }} -->
 </head>
 <style>
 	/* * { margin: 0; } */
 	:root {
 		font-family: consolas;
-		background-color: #050505;
+		--global-background-color: #050505;
+		background-color: var(--global-background-color);
 		color: var(--primary-text-color);
 
 		--primary-text-color: white;
 		--secondary-text-color: gray;
 		--secondary-text-color-hover: rgba(128, 128, 128, 0.8);
+		--elements-border-radius: 0.45rem;
+		/* --elements-border-radius: 0; */
 
 		--lighting-1: #FFFFFF08;
 		--lighting-2: #FFFFFF10;
@@ -69,6 +72,7 @@
 		font-size: 2rem;
 		font-weight: 600;
 	}
+	.dim { color: var(--secondary-text-color); }
 	.breadcrumbs {
 		font-family: 'Roboto Mono', 'JetBrains Mono', 'Cascadia Code';
 		color: var(--secondary-text-color);
@@ -85,6 +89,8 @@
 		margin: 0;
 	}
 
+	img { user-select: none; }
+
 	header {
 		/* Хедер растягивается на всю ширину */
 		flex: 0 0 auto; /* Но не растягивается, не сжимается, авто высота */
@@ -93,25 +99,97 @@
 		min-height: 0; /* Ключевое свойство для работы скролла в flex-контейнере */
 	}
 
+	table {
+		border-collapse: collapse;
+		width: 100%;
+		margin: 1em 0;
+		--border: 1px solid var(--lighting-2);
+
+		th, td {
+			border-bottom: var(--border);
+			padding: 8px 12px;
+			text-align: left;
+			vertical-align: top;
+		}
+
+		th {font-weight: bold;}
+		td:empty::before {content: "—";}
+
+		&.full {
+			th {background-color: var(--lighting-2); }
+			th, td { border: var(--border); }
+		}
+	}
+
+	button, input, textarea, select, option {
+		font-family: inherit;
+		font-weight: inherit;
+		font-size: inherit;
+		color: inherit;
+	}
+
+	input, textarea, select, option {
+		border-radius: var(--elements-border-radius);
+		background-color: var(--lighting-1);
+		border: 1px solid var(--lighting-1);
+	}
+	select {
+		padding-inline: 0.5rem;
+		padding-block: 0.25rem;
+	}
+	option {
+		background-color: var(--global-background-color);
+		border-radius: 0.5rem;
+	}
+
+	form {
+		flex-direction: column;
+		display: flex;
+		align-items: center;
+		background-color: var(--lighting-1);
+		border: 1px solid var(--lighting-2);
+		border-radius: calc(var(--elements-border-radius) * 2);
+		padding: 0.8rem;
+		gap: 0.5rem;
+
+		button {
+			border-radius: var(--elements-border-radius);
+			padding-inline: 1rem;
+		}
+		table {
+			margin: 0;
+			td, th {
+				border: none;
+				padding: 0.25rem;
+			}
+			input, textarea, select {
+				width: 100%;
+				resize: none;
+			}
+		}
+
+		&.hidden {
+			background: none;
+			border: none;
+			padding: 0;
+		}
+	}
+
 	.content-container {
 		display: flex;
 		flex-direction: column;
 		flex: 1; /* Занимает все оставшееся пространство */
-		min-height: 0; /* Ключевое свойство для работы скролла в flex-контейнере */
 	}
 
 	.burger {
 		background-color: var(--lighting-1);
 		border-right: 1px solid var(--lighting-1);
-		width: 16rem;
+		min-width: 16rem;
 		padding: 1rem;
 		overflow-y: auto; /* На случай, если меню тоже будет длинным */
 		display: flex;
 		flex-direction: column;
 		justify-content: stretch;
-
-		/* Как идея */
-		--burger-border-radius: 0.45rem;
 
 		.pages-list {
 			display: flex;
@@ -126,24 +204,26 @@
 				flex-direction: column;
 				gap: 0.5rem;
 
-				.button:first-child {
-					border-top-left-radius: var(--burger-border-radius);
-					border-top-right-radius: var(--burger-border-radius);
-				}
 
-				.button:last-child {
-					border-bottom-left-radius: var(--burger-border-radius);
-					border-bottom-right-radius: var(--burger-border-radius);
-				}
+				.button {
+					.onhover { display: none; }
+					&:hover .onhover { display: initial; }
 
-				.button.current {background-color: var(--lighting-3);}
-				.button.current:hover {background-color: var(--lighting-4);}
-				.button.current:active {background-color: var(--lighting-5);}
+					&:first-child {
+						border-top-left-radius: var(--elements-border-radius);
+						border-top-right-radius: var(--elements-border-radius);
+					}
+
+					&:last-child {
+						border-bottom-left-radius: var(--elements-border-radius);
+						border-bottom-right-radius: var(--elements-border-radius);
+					}
+				}
 			}
 		}
 	}
 
-	main {
+	main, .debug-mode-content-block {
 		display: flex;
 		flex-direction: column;
 		flex: 1; /* Занимает всё доступное пространство */
@@ -152,35 +232,46 @@
 		min-height: 0; /* Также важно для flex-элементов */
 	}
 
-	::-webkit-scrollbar {width: 0.35rem;}
-	::-webkit-scrollbar-track {background-color: var(--lighting-2);}
-	::-webkit-scrollbar-thumb {background-color: var(--lighting-2);}
+	::-webkit-scrollbar {width: 0.35rem; height: 0.35rem;}
+	::-webkit-scrollbar-track,
+	::-webkit-scrollbar-thumb {
+		background-color: var(--lighting-2);
+		border-radius: min(var(--elements-border-radius, 0) * 999, 100vh);
+	}
+
 	::-webkit-scrollbar-thumb:hover {background-color: var(--lighting-3);}
 	::-webkit-scrollbar-thumb:active {background-color: var(--lighting-4);}
 
-	button {
-		font-family: inherit;
-		font-weight: inherit;
-		font-size: inherit;
-		color: inherit;
-	}
-	.button {
+	.button, button {
 		background-color: var(--lighting-1);
+		--border-color: var(--lighting-1);
 		border: 1px solid var(--lighting-1);
-		padding: 0.5rem;
+		--padding: 0.5rem;
+		padding: var(--padding);
 		user-select: none;
 		text-align: center;
 		cursor: pointer;
+
+		&:hover {background-color: var(--lighting-2);}
+
+		&.current {
+			background-color: var(--lighting-3);
+			box-shadow: inset 0 0 0 1px var(--border-color);
+
+			&:hover {background-color: var(--lighting-4);}
+			&:active {background-color: var(--lighting-5);}
+		}
 	}
-	.button .onhover { display: none; }
-	.button:hover .onhover { display: initial; }
+
 	a.button, a.button:hover, a.button:active, a.button:visited {
 		color: var(--primary-text-color);
 	}
-	.button:hover {background-color: var(--lighting-2);}
-	.button:active, .switch input:checked + .button {
+
+	.button:active, button:active,
+	.switch input:checked + .button {
 		background-color: var(--lighting-3);
 	}
+
 	.switch {
 		position: relative;
 		display: inherit;
@@ -202,11 +293,159 @@
 		text-overflow: ellipsis;
 		overflow: hidden;
 	}
+	.underlined-on-hover:hover {
+		text-decoration: underline;
+	}
 
 	details summary {user-select: none;}
 
 	.formatted-text-block {
 		a:hover { text-decoration: underline; }
+		p {margin-block: 1rem;}
+	}
+
+	.hideOnDebugMode.onActive {display: none;}
+	.showOnDebugMode.onUnactive {display: none;}
+
+	.list-container.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+		gap: 0.5rem;
+	}
+	.list-container.flex {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+
+		.item-card {
+			width: 12rem;
+			flex: 0 0 12rem;
+
+			.body {
+				width: 12rem;
+			}
+		}
+	}
+
+	.item-card {
+		height: 16rem;
+		background-color: rgba(0, 0, 0, 0);
+		border-color: var(--lighting-2);
+		border-radius: var(--elements-border-radius);
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		padding: 0;
+
+		img {
+			width: 100%;
+			height: 70%;
+			object-fit: cover;
+		}
+		.body {
+			padding: var(--padding);
+			flex: 1 1;
+			min-height: 0;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			/* word-wrap: break; */
+			text-overflow: ellipsis;
+		}
+	}
+
+	.images-block {
+		display: flex;
+		flex-direction: column;
+		padding-block: 0.5rem;
+
+		img {
+			border: 1px solid var(--lighting-2);
+			border-radius: var(--elements-border-radius);
+			object-fit: cover;
+		}
+
+		& > img:first-of-type {
+			aspect-ratio: 2;
+			width: 100%;
+		}
+
+		.subimages-row {
+			padding-block: 0.5rem;
+			display: flex;
+			align-items: stretch;
+			overflow: auto;
+			gap: 0.5rem;
+			height: 8rem;
+
+			& > * {
+				flex: 0 0 12rem;
+			}
+		}
+	}
+
+	.facility-item-card {
+		border-radius: var(--elements-border-radius);
+		height: 18rem;
+		max-width: 12rem;
+		display: flex;
+		flex-direction: column;
+		background-color: rgba(0, 0, 0, 0);
+		--border-color: var(--lighting-2);
+		border-color: var(--border-color);
+		padding: 0;
+		overflow: hidden;
+
+		img {
+			object-fit: cover;
+		}
+		.main-image {
+			width: 100%;
+			flex: 1 1 auto;
+			min-height: 0;
+			border-bottom: 1px solid var(--border-color);
+		}
+		.body {
+			max-width: 100%;
+			padding: 0.5rem;
+			/* text-wrap-style: balance; */
+			word-break: break-all;
+			display: flex;
+			flex-direction: column;
+
+			& > * {
+				&:not(:last-child) {
+					border-bottom: 1px solid var(--lighting-1);
+				}
+
+				--padding: 0.125rem;
+				&:not(:last-child):not(:first-child) {
+					padding-block: var(--padding);
+				}
+				&:first-child {
+					padding-bottom: var(--padding);
+				}
+				&:last-child {
+					padding-top: 0.5rem;
+				}
+
+			}
+
+			.product-icons {
+				display: flex;
+				flex-wrap: wrap;
+				flex: 0 1 0%;
+				justify-content: center;
+				gap: 0.5rem;
+
+				img {
+					border-radius: var(--elements-border-radius);
+					width: 2rem;
+					aspect-ratio: 1;
+					flex: 0 0 2rem;
+				}
+			}
+		}
 	}
 
 	/* shortcut */
@@ -218,7 +457,7 @@
 <body>
 	<div class="burger">
 		<h1 class="main-title" style="margin-bottom: 2rem;">
-			Debug UI v0.1
+			Debug UI v0.2
 		</h1>
 
 		<div class="sc-flex-column" style="gap: 0.5rem;">
@@ -227,23 +466,23 @@
 					class="button"
 					href="{{page_info.get_admin_url}}"
 					style="
-						border-top-left-radius: var(--burger-border-radius);
-						border-top-right-radius: var(--burger-border-radius);
+						border-top-left-radius: var(--elements-border-radius);
+						border-top-right-radius: var(--elements-border-radius);
 					">Смотреть в админке</a>
 				<label class="switch">
-					<input type="checkbox">
+					<input type="checkbox" id="enableDebugModeCheckbox">
 					<span class="button">
 						<span class="toggle-marker selected">›</span>
-						Переключить контекст
+						Переключить DEBUG режим
 					</span>
 				</label>
 			</div>
 			<div style="display: flex; gap: 0.5rem;">
 				<a class="button"
-					style="flex: 1; border-bottom-left-radius: var(--burger-border-radius);"
+					style="flex: 1; border-bottom-left-radius: var(--elements-border-radius);"
 					href="/sitemap.xml">Sitemap.xml</a>
 				<a class="button"
-					style="flex: 1; border-bottom-right-radius: var(--burger-border-radius);"
+					style="flex: 1; border-bottom-right-radius: var(--elements-border-radius);"
 					href="/robots.txt">Robots.txt</a>
 			</div>
 		</div>
@@ -253,7 +492,7 @@
 			<div class="body">
 				{% for gpage in global.pages.values %}
 				<!-- только для page -->
-				{% with is_current=gpage.pk|is_equal:page.pk %}
+					{% with is_current=page|default:None|is_equal:gpage %}
 					<a class="button {% if is_current %}current{% endif %} oneline-text"
 						style="text-align: left;"
 						title="{{ gpage.name }}"
@@ -262,7 +501,7 @@
 						{{ gpage.name }}
 						<span class="onhover">‹</span>
 					</a>
-				{% endwith %}
+					{% endwith %}
 				{% endfor %}
 			</div>
 		</div>
@@ -270,30 +509,117 @@
 	<div class="content-container">
 		<header class="breadcrumbs">
 			<!-- Будет генерироваться -->
-			<a class="a-inherit" href="/"
-				>Главная</a
-			>/<a class="a-inherit" href="/">Каталог</a>/<a class="a-inherit" href="/">Коллекторные шкафы</a>/<a class="a-inherit" href="/">Настенные</a>/<a class="a-inherit" href="/">ВКБД - 20</a>
+			<a class="a-inherit add-sounds" href="/">{{global.pages.index.name}}</a>
+			{% for el in page_info.get_breadcrumbs %}
+				<!-- Также можно через -->
+				<!-- {% if not forloop.last %} → (например) {% endif %} -->
+				<!--           ^^^^^^^^^^^^ -->
+				› <a
+					class="a-inherit add-sounds"
+
+					{% if not el|is_equal:object %}
+						href="{{el.get_absolute_url}}"
+					{% else %}
+					style="cursor: default; user-select: none;"
+					{% endif %}
+				>{{el.name}}</a>
+			{% endfor %}
 		</header>
-		<main>
+		<main class="hideOnDebugMode">
 			{% block content %}
 			<div style="text-align: center;">
 				<div>Тут пусто. Ага.</div>
-				<div style="color: gray; font-size: 0.75rem;">(наполнение content по умолчанию)</div>
+				<div class="dim" style="font-size: 0.75rem;">(наполнение content по умолчанию)</div>
 			</div>
 			<style>
 				main {
-					display: flex;
 					justify-content: center;
 					align-items: center;
 				}
 			</style>
 			{% endblock %}
 		</main>
+		<div class="debug-mode-content-block showOnDebugMode">
+			{% current_context %}
+			<table class="full">
+				<thead>
+					<tr>
+						<th>Параметр</th>
+						<th>Значение</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><b>H1</b></td>
+						<td>{{ page_info.get_h1 }}</td>
+					</tr>
+					<tr>
+						<td><b>HTML Title</b></td>
+						<td>{{ page_info.get_html_title }}</td>
+					</tr>
+					<tr>
+						<td><b>HTML Description</b></td>
+						<td>{{ page_info.get_html_description }}</td>
+					</tr>
+					<tr>
+						<td><b>Image URL</b></td>
+						<td>
+							{% if page_info.get_image_url %}
+								<a href="{{ page_info.get_image_url }}" target="_blank">{{ page_info.get_image_url }}</a>
+							{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<td><b>OG Type</b></td>
+						<td>{{ page_info.og_type }}</td>
+					</tr>
+					<tr>
+						<td><b>OG Title</b></td>
+						<td>{{ page_info.og_title }}</td>
+					</tr>
+					<tr>
+						<td><b>OG Description</b></td>
+						<td>{{ page_info.og_description }}</td>
+					</tr>
+					<tr>
+						<td><b>OG Image URL</b></td>
+						<td>
+							{% if page_info.og_image_url %}
+								<a href="{{ page_info.og_image_url }}" target="_blank">{{ page_info.og_image_url }}</a>
+							{% else %}
+								—
+							{% endif %}
+						</td>
+					</tr>
+					<tr>
+						<td><b>Breadcrumbs</b></td>
+						<td>
+							{% with breadcrumbs=page_info.get_breadcrumbs %}
+								{% if breadcrumbs %}
+									{{ breadcrumbs|repr }}
+								{% else %}
+									—
+								{% endif %}
+							{% endwith %}
+						</td>
+					</tr>
+					<tr>
+						<td><b>Absolute URL</b></td>
+						<td>
+							{% if page_info.get_absolute_url %}
+								<a href="{{ page_info.get_absolute_url }}" target="_blank">{{ page_info.get_absolute_url }}</a>
+							{% else %}
+								—
+							{% endif %}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </body>
 {% if settings.DEBUG_TEMPLATES_SOUNDS_ENABLED %}
 <script>
-	// base64 format
 	const getUrl = el => `https://github.com/space-wizards/space-station-14/raw/refs/heads/master/Resources/Audio/${el}.ogg`;
 	const hoverSound = new Audio(getUrl("UserInterface/hover"));
 	const clickSound = new Audio(getUrl("UserInterface/click"));
@@ -304,33 +630,42 @@
 	switchSound.volume = parseFloat("{{ settings.DEBUG_TEMPLATES_SWITCH_SOUND_VOLUME }}");
 
 	document.addEventListener('DOMContentLoaded', function() {
-		document.querySelectorAll('.volume-slider').forEach(slider => {
-			slider.addEventListener('input', (e) => {
-				const volume = parseFloat(e.target.value);
-				if (e.target.dataset.sound === 'hover') {
-					hoverSound.volume = volume;
-				} else if (e.target.dataset.sound === 'click') {
-					clickSound.volume = volume;
-				} else if (e.target.dataset.sound === 'switch') {
-					clickSound.volume = volume;
-				}
-			});
-		});
-		isButton = event => event.target.closest('.button') || event.target.closest('.add-sounds');
+		requireAddSounds = event => (
+			event.target.closest('.button') ||
+			event.target.closest('button') ||
+			event.target.closest('.add-sounds'));
 		document.addEventListener('click', function(event) {
 			if (event.target.closest('.switch')) {
 				switchSound.currentTime = 0;
 				switchSound.play();
-			} else if (isButton(event)) {
+			} else if (requireAddSounds(event)) {
 				clickSound.play();
 			}
 		});
 		document.addEventListener('mouseover', function(event) {
-			if (isButton(event)) {
+			if (requireAddSounds(event)) {
 				hoverSound.currentTime = 0;
 				hoverSound.play();
 			}
 		});
+
+		function updateCtxModeElements() {
+			const isDebugMode = document.getElementById('enableDebugModeCheckbox').checked;
+			const elements = [
+				...document.querySelectorAll('.hideOnDebugMode'),
+				...document.querySelectorAll('.showOnDebugMode')
+			]
+
+			elements.forEach(el => {
+				el.classList.toggle('onActive', isDebugMode);
+				el.classList.toggle('onUnactive', !isDebugMode);
+			});
+		}
+
+		const debugModeCheckbox = document.getElementById('enableDebugModeCheckbox');
+		// Первоначальная настройка
+		updateCtxModeElements();
+		debugModeCheckbox.addEventListener('change', updateCtxModeElements);
 	});
 </script>
 {% endif %}
