@@ -1,1 +1,0 @@
-from .general import get_base_renderables_sitemaps
