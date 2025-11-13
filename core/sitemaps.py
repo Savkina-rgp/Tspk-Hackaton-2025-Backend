@@ -7,6 +7,8 @@ from shared.reflection import get_subclasses
 # На случай, если нужен будет кастомный Sitemap для модели
 _EXCLUDED_MODELS: set = set()
 
+# Если какая-то запись будет не нужна в Sitemap - её исключат в
+# robots.txt через disallow
 def get_base_renderables_sitemaps() -> dict[str, GenericSitemap]:
 	return {
 		model._meta.model_name: GenericSitemap({

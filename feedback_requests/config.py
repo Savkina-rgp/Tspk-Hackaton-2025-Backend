@@ -7,7 +7,8 @@
 # Также, в случае чего, фактически сразу есть готовая структура для секций в TOML, или групп
 # в другом формате.
 class TELEGRAM_SEND_NOTIFICATIONS:
-	SECONDS_BETWEEN_ATTEMPTS: float = 0.5
-	STOP_ATTEMPTS_HTTP_CODES: set[int] = {400, 404}
-	ATTEMPTS_COUNT: int = 10
+	TIMEOUT: float = 5 # sec
+	RETRY_ATTEMPT_HTTP_CODES: set[int] = {5, 429}
+	SLEEP_TIME_ON_TOO_MANY_REQUESTS: float = 1
+	ATTEMPTS_COUNT: int = 3
 	TG_MESSAGE_TEMPLATE_NAME: str = 'telegram/new_feedback_request_message.html'

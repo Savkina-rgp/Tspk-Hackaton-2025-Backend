@@ -4,10 +4,11 @@ from django.utils.safestring 	import mark_safe
 from django.core.exceptions 	import ImproperlyConfigured
 from django.contrib 			import admin
 
-from mptt.admin import DraggableMPTTAdmin
+from adminsortable2.admin import SortableAdminMixin
 
 from core.models.bases 	import BaseRenderableModel
-from shared 			import typename
+from shared.reflection 	import typename
+
 
 _logger = getLogger(__name__)
 
@@ -38,10 +39,5 @@ class BaseRenderableModelAdmin(admin.ModelAdmin):
 			)
 	view_on_site_link.short_description = 'Ссылка'
 
-# Было нужно, но раз уже сделал, зачем удалять?
-class RenderableMPTTAdmin(DraggableMPTTAdmin, BaseRenderableModelAdmin):
-	append_to_list_display = ('view_on_site_link',)
-
-	@property
-	def list_display(self):
-		return DraggableMPTTAdmin.list_display + self.append_to_list_display
+class OrderedModelAdmin(SortableAdminMixin, admin.ModelAdmin):
+	pass

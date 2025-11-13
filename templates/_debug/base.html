@@ -23,7 +23,7 @@
 		<title>{{ page_info.get_html_title|default:global.site_settings.site_name }}</title>
 	{% endblock %}
 
-	<meta name="description" content="{{page_info.get_html_description}}">
+	<meta name="description" content="{{page_info.html_description}}">
 	<meta name="og:type" content="{{page_info.og_type}}">
 	{% block custom_og_tags %}{% endblock %}
 	<meta name="og:title" content="{{page_info.og_title}}">
@@ -37,13 +37,8 @@
 	<link rel="cannonical" href="{{page_info.get_absolute_url}}">
 
 	<meta charset="utf-8">
-	{% with microdata=page_info.get_microdata_dumped %}
-		{% if microdata %}
-			<script type="application/ld+json">{{microdata}}</script>
-	{% endif %}{% endwith %}
-
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-	<!-- {{ global.site_settings.head_addition }} -->
+	{{ global.site_settings.head_addition }}
 </head>
 <style>
 	/* * { margin: 0; } */
@@ -559,7 +554,7 @@
 					</tr>
 					<tr>
 						<td><b>HTML Description</b></td>
-						<td>{{ page_info.get_html_description }}</td>
+						<td>{{ page_info.html_description }}</td>
 					</tr>
 					<tr>
 						<td><b>Image URL</b></td>

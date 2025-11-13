@@ -27,6 +27,7 @@ dependencies = [
 	"requests",
 	"psycopg2-binary",
 	"django-admin-sortable>=2.3",
+	"djangorestframework>=3.16.1",
 ]
 
 [dependency-groups]

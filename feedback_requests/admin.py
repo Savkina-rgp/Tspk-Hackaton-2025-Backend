@@ -1,4 +1,4 @@
-from django.contrib.admin 	import ModelAdmin
+from django.contrib.admin import ModelAdmin
 
 from rangefilter.filters import DateRangeFilter
 
@@ -20,15 +20,11 @@ class FeedbackRequestAdmin(ModelAdmin):
 		add_date_to_name = True,
 		set_ordering = ('created_at')
 	)]
-	list_display = ('request_from', 'phone_number', 'created_at')
+	list_display = ('__str__', 'phone_number', 'seen', 'created_at')
 	list_filter = (
 		('created_at', DateRangeFilter),
 	)
 	sortable_by = ('created_at', )
 	ordering = ('-created_at', )
-
-	def request_from(self, obj: FeedbackRequest) -> str:
-		return obj.requestener_name
-	request_from.short_description = 'Заявка от'
 
 registrator.register()

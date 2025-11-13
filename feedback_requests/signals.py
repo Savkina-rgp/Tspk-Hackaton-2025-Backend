@@ -4,7 +4,7 @@ from django.db.models.signals 	import post_save
 from django.template.loader 	import render_to_string
 from django.dispatch 			import receiver
 
-from requests import HTTPError
+from requests import HTTPError, status_codes
 
 from feedback_requests.config 	import TELEGRAM_SEND_NOTIFICATIONS
 from feedback_requests.models 	import FeedbackRequest
@@ -13,7 +13,7 @@ from core.models.general 		import TelegramSendingChannel
 
 _logger = logging.getLogger(__name__)
 
-# Если потребуются аналогичные обработчики - вынесу общий код
+
 @receiver(post_save, sender = FeedbackRequest)
 def send_new_request_notification_into_telegram(sender, instance: FeedbackRequest, created, **kwargs):
 	if not created:
@@ -37,23 +37,32 @@ def send_new_request_notification_into_telegram(sender, instance: FeedbackReques
 
 		if success:
 			# Завершаем работу функции
+			instance.seen = True
+			instance.save()
 			_logger.debug(f"Успешно отправил уведомление о новой заявке в телеграмм.")
 			return
 
-		error_message = str(ex)
 
+		error_message = str(ex)
 		# Это ошибка статуса (raise_for_status())
 		if isinstance(ex, HTTPError):
 			error_message = f"{ex.response.status_code}: {ex.response.json()['description']}"
-			# Не пытаемся дальше отправлять запросы, сообщение об ошибке будет
-			# обработано логгером ниже.
-			if ex.response.status_code in \
-				TELEGRAM_SEND_NOTIFICATIONS.STOP_ATTEMPTS_HTTP_CODES:
+
+			status_code: int = ex.response.status_code
+			status_group = status_code // 100
+
+			code_allow_retry = lambda code: code in TELEGRAM_SEND_NOTIFICATIONS.RETRY_ATTEMPT_HTTP_CODES
+			if not any(map(code_allow_retry, (status_group, status_code))):
 				_logger.debug(
-					f'Это HTTPError и код ошибки в списке для прекращения попыток отправить сообщение')
+					f'Это HTTPError и кода ошибки нет в списке для прекращения попыток отправить сообщение')
 				break
 
-		time.sleep(TELEGRAM_SEND_NOTIFICATIONS.SECONDS_BETWEEN_ATTEMPTS)
+			TOO_MANY_REQUESTS = 429
+			if status_code == TOO_MANY_REQUESTS:
+				pause_time = TELEGRAM_SEND_NOTIFICATIONS.SLEEP_TIME_ON_TOO_MANY_REQUESTS
+
+				_logger.debug(f"Это Too Many Requests, ухожу в \"спячку\" на {pause_time}.")
+				time.sleep(pause_time)
 
 	# Все ошибки будут обработаны тут
 	_logger.error(f"Не смог отправить уведомление о создании новой заявки в телеграм: {error_message}")

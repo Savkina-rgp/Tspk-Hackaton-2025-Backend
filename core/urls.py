@@ -5,9 +5,8 @@ from django.urls 					import path
 from core.sitemaps 	import get_base_renderables_sitemaps
 from core 			import views
 
-_sitemaps = {
-	**get_base_renderables_sitemaps(),
-}
+# В отдельной переменной, на случай, если нужно будет добавить другие Sitemaps
+_sitemaps = get_base_renderables_sitemaps()
 
 urlpatterns = [
 	path('favicon.ico', views.FaviconView.as_view()),

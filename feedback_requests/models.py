@@ -5,9 +5,18 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class FeedbackRequest(models.Model):
-	requestener_name = models.CharField(max_length = 24, verbose_name = "Имя")
-	phone_number     = PhoneNumberField(verbose_name = "Номер телефона")
-	created_at       = models.DateTimeField(auto_now_add = True, verbose_name = "Дата заполнения заявки")
+	seen = models.BooleanField("Увидено персоналом", default=False, help_text=(
+		'Если уведомление о создании новой заявки успешно ушло '
+		'в телеграм — автоматически считается "Увиденным". '
+		'Иначе, считается что заявку не увидели и нужно вручную '
+		'поставить эту галочку админке, когда её увидят.'
+	))
+
+	requestener_name = models.CharField("Имя", max_length = 24)
+	phone_number = PhoneNumberField("Номер телефона")
+	email = models.EmailField('Почта', blank = True)
+	comment = models.TextField('Комментарий', blank=True, max_length = 512)
+	created_at = models.DateTimeField("Дата заполнения заявки", auto_now_add = True)
 
 	class Meta:
 		verbose_name = 'Заявка на обратную связь'

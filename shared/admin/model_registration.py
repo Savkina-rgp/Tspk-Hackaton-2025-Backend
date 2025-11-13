@@ -1,7 +1,7 @@
 from importlib	import import_module
 from logging 	import getLogger
 
-from django.contrib.admin 	import ModelAdmin, site
+from django.contrib.admin 	import ModelAdmin, site, options
 from django.db.models 		import Model
 from django.conf 			import settings
 from django.apps 			import apps
@@ -17,6 +17,8 @@ _logger = getLogger(__name__)
 # Ps: если указать Model: CustomModelAdmin - это сработает.
 _default_admin_classes_for_models: dict[type[Model], type[ModelAdmin]] = { }
 _defaults_loaded: bool = False
+_hidden_admin_class: type[ModelAdmin] | None = None
+
 
 def _get_default_admin_class_for_model(model_class: type[Model]) -> type[ModelAdmin] | None:
 	for cls in model_class.mro():
@@ -87,17 +89,40 @@ def _load_default_admin_classes_for_models():
 		model_module, model_class_name = model_path.rsplit('.', 1)
 		admin_module, admin_class_name = admin_path.rsplit('.', 1)
 
-		model_class = getattr(import_module(model_module), model_class_name)
-		admin_class = getattr(import_module(admin_module), admin_class_name)
-
 		_set_default_admin_class_for_model_subclasses(
-			model_class = model_class,
-			admin_class = admin_class
+			model_class = getattr(import_module(model_module), model_class_name),
+			admin_class = getattr(import_module(admin_module), admin_class_name)
 		)
 
 	_defaults_loaded = True
 
-# PROBLEM: Нельзя реализовать регистрацию моделей по разным файлам
+# TODO: Вынести в отдельный Python пакет
+# TODO: Добавить hide_model в документацию
+# TODO: Добавить exclude_inline_model в документацию
+# TODO: Убрать exclude_models из документации
+# TODO: Добавить в документацию, как использовать при регистрации через несколько файлов
+# 	admin/
+# 		__init__.py:
+# 			| registrator = AdminModelRegistrator()
+# 			| from .general import * # <- Импорт для инициализации модулей
+# 		general.py:
+# 			| from . import registrator
+# 			| @registrator.set_for_model(...)
+# 			| class ...(...): ...
+# 	apps.py:
+# 		| class ...Config(...):
+# 		|     def ready(self):
+# 		|         from admin import registrator
+# 		|         registrator.register()
+# TODO: Добавить проверки, что модели уже где-то не зарегистрированы
+# TODO: Добавить поддержку множественного наследования в resolver админ-класса по умолчанию
+# TODO: Сделать resolver подменяемым, resolver по умолчанию задавать через настройки,
+# добавить его в аргументы конструктора для возможности локальной подмены.
+# (не скрытая ли, не исключена ли, не зарегистрирована ли в Django)
+# NOTE: Переименовать переменную custom_admin_classes_for_models и связанные с ней методы?
+# NOTE: Мб. добавить инструментарий для регистрации по умолчанию с параметрами?
+# Например, register_with(model, params: dict) (.register_with(MyModel, dict(inlines = [MyModelImageInline])))
+# где MyModel - Ordered & BR Model с OrderedBaseRenderableModelAdmin
 class AdminModelRegistrator:
 	"""
 	`AdminModelRegistrator` нужен для удобной автоматической регистрации моделей
@@ -207,9 +232,9 @@ class AdminModelRegistrator:
 		"""Исключит модель из списка для регистрации."""
 		self._excluded_models.add(model)
 
-	def exclude_models(self, models: set[type[Model]]):
-		"""Исключит модели из списка для регистрации."""
-		self._excluded_models.update(models)
+	def exclude_inline_model(self, inline_class: type[options.InlineModelAdmin]):
+		"""Исключит модель инлайна из списка для регистриции"""
+		self.exclude_model(inline_class.model)
 
 	def set_custom_admin_class_for_model(self, model: type[Model], admin_class: type[ModelAdmin]):
 		"""Установит кастомную `ModelAdmin` для указанной модели."""
@@ -223,6 +248,23 @@ class AdminModelRegistrator:
 			return admin_class
 
 		return decorator
+
+	# TODO: Реализовать hide_model по нормальному
+	# - Отдельную переменную для отметки моделей как скрытых
+	# - Регистрировать под HiddenModel в методе регистрации
+	__default_hidden_admin_class: type[ModelAdmin] | None = None
+	def hide_model(self, model: type[Model]):
+		cls = type(self)
+		if not cls.__default_hidden_admin_class:
+			cls.__default_hidden_admin_class = type(
+				'HiddenAdmin', (ModelAdmin, ),
+				{'get_model_perms': lambda *_: {}}
+			)
+
+		# Тут отдельную переменную
+		self.set_custom_admin_class_for_model(
+			model, (_hidden_admin_class or cls.__default_hidden_admin_class)
+		)
 
 
 	def register(self):

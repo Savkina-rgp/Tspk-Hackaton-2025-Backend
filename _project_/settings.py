@@ -286,11 +286,12 @@ SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
 
 # MARK: Project
 DEFAULT_MODEL_ADMIN_CLASSES = {
-	'solo.models.SingletonModel': 'solo.admin.SingletonModelAdmin',
-	'mptt.models.MPTTModel': 'mptt.admin.DraggableMPTTAdmin',
+	'solo.models.SingletonModel': 	'solo.admin.SingletonModelAdmin',
+	'mptt.models.MPTTModel': 		'mptt.admin.DraggableMPTTAdmin',
 
 	# Project
-	'core.models.bases.BaseRenderableModel': 'core.admin.bases.BaseRenderableModelAdmin',
+	'core.models.bases.BaseRenderableModel': 	'core.admin.bases.BaseRenderableModelAdmin',
+	'core.models.bases.OrderedModel': 			'core.admin.bases.OrderedModelAdmin',
 }
 DEBUG_TEMPLATES_SOUNDS_ENABLED = env.bool('DEBUG_TEMPLATES_SOUNDS_ENABLED', True)
 DEBUG_TEMPLATES_HOVER_SOUND_VOLUME = str(env.float('DEBUG_TEMPLATES_HOVER_SOUND_VOLUME', 0.2))

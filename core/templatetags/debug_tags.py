@@ -74,3 +74,7 @@ def current_context(context: RequestContext):
 	# 	<strong>Template Context</strong>
 	# 	{format_value(context_data)}
 	# </div>
+
+@register.filter('repr')
+def _repr(obj):
+	return repr(obj)

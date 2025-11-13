@@ -3,7 +3,7 @@ from django.views 		import View
 from django.http 		import HttpResponse, HttpResponseNotFound
 
 from core.models.singletons import SiteSettings
-from shared 				import typename
+from shared.reflection 		import typename
 
 
 # Решил выделить в отдельный модуль потому, что это технический View,

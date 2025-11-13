@@ -2,8 +2,7 @@
 <b>Новая заявка!</b>
 Заявитель: <code>{{ request.requestener_name }}</code>
 Номер телефона: {{ request.phone_number }}
-Почта: {{ request.email }}
-{% if request.comment %}
-Комментарий:
+{% if request.email %}Почта: {{ request.email }}{% endif %}
+{% if request.comment %}Комментарий:
 <blockquote>{{ request.comment }}</blockquote>
 {% endif %}

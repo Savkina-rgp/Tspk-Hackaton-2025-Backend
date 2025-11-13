@@ -1,5 +1,5 @@
 from functools 	import cached_property
-from typing 	import Self
+from typing 	import Self, Optional
 from os 		import getenv
 import logging
 
@@ -14,27 +14,39 @@ import requests
 
 from shared.models.validators 	import *
 from shared.models.managers 	import IndividualizedBulkOperationsManager
-from shared.telegram.params 	import MessageParseMode
+from shared.telegram.params 	import ParseMode
 from shared.reflection 			import typename
-from core.models.bases 			import BaseRenderableModel
+from core.models.bases 			import BaseRenderableModel, OrderedModel
 # from core.views.bases 		import GenericPageView (circular import, locally imported in Page.clean())
 from core.constants 			import RENDERING_SUPPORTS_TEXT
-from core.config 				import TELEGRAM_SENDING, GENERIC_TEMPLATE
+from core.config 				import GENERIC_TEMPLATE
 
 _logger = logging.getLogger(__name__)
 
-class Page(BaseRenderableModel):
+class PageManager(models.Manager):
+	def get_by_slug(self, slug: str) -> Optional['Page']:
+		"""
+		Попытается вернуть объект Page с указанным slug.
+		Если Page с таким slug нет - вернёт None и оставит запись в логах.
+		"""
+		page = self.filter(slug = slug).first()
+		if not page:
+			_logger.warning(f'Page со slug = {slug} не существует, ')
+		return page
+
+class Page(OrderedModel, BaseRenderableModel):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.extra_context_manager: models.Manager['ExtraContext']
 		self.children_pages: models.Manager['Page']
 
-	order = models.PositiveSmallIntegerField(default=0, db_index=True)
+	add_to_header = models.BooleanField('Отображать в главном header?', default=True,
+		help_text='Страницы без этой галочки не будут отображаться в главном хедере сайта.')
 
 	content = HTMLField('Контент', blank = True, help_text = RENDERING_SUPPORTS_TEXT)
 	is_generic_page = models.BooleanField('Это динамически-добавляемая страница?', default = False,
 		help_text = mark_safe(
-			'✅: Будет автоматически доступно по url <code>"/<slug>/"</code>, требует заданного '
+			'✅: Будет автоматически доступно по url <code>"/&ltslug&gt/"</code>, требует заданного '
 			'<code>Template name</code>. Используйте для простых страниц, которым не нужен свой View.<br>'
 			'❌: Выбирайте, когда для обработки страницы нужно использовать кастомный View.<br>'
 			'<br>'
@@ -109,6 +121,9 @@ class Page(BaseRenderableModel):
 		"""Для темплейтов"""
 		return {ctx.key: ctx.value for ctx in self.extra_context_manager.all()}
 
+	def get_breadcrumbs(self):
+		return [self] if self.slug != 'index' else []
+
 
 class ExtraContext(models.Model):
 	key = models.CharField('Ключ', max_length = 64)
@@ -140,8 +155,7 @@ class TelegramSendingChannel(models.Model):
 		# Добавлять новые специализации тут
 
 	token_env_name = models.CharField('ENV-переменная с токеном', validators = [env_variable_name],
-		help_text = 'Название ENV переменной с токеном этого бота. '
-		'Также проверяется существование токена в телеграм системе.')
+		help_text = 'Название ENV переменной с токеном этого бота.')
 	chat_id = models.CharField('ID чата', max_length = 32,
 		help_text = 'Если был передан некорректный ID чата - ошибка возникнет только при '
 		'первой попытке отправить сообщение, будте внимательны!')
@@ -252,9 +266,8 @@ class TelegramSendingChannel(models.Model):
 
 	def send_message(
 			self, text: str, *,
-			parse_mode: MessageParseMode = MessageParseMode.HTML,
-			timeout: float = TELEGRAM_SENDING.DEFAULT_SEND_MESSAGE_TIMEOUT):
-		# Можно избежать блокировки потока, используя ASGI + async
+			parse_mode: ParseMode = ParseMode.HTML,
+			timeout: float | None = None):
 		"""
 		**ВНИМАНИЕ!!!** Блокирует поток выполнения!
 
@@ -267,7 +280,7 @@ class TelegramSendingChannel(models.Model):
 		payload = {
 			'text': text,
 			'chat_id': self.chat_id,
-			'parse_mode': parse_mode.value # Можно без .value (StrEnum), но так понятней
+			'parse_mode': parse_mode # Можно без .value (StrEnum)
 		}
 
 		response = requests.post(url, json = payload, timeout = timeout)
@@ -275,10 +288,9 @@ class TelegramSendingChannel(models.Model):
 
 	def try_send_message(
 			self, text: str, *,
-			parse_mode: MessageParseMode = MessageParseMode.HTML,
-			**kwargs # Все остальные настройки не так часто используются
+			parse_mode: ParseMode = ParseMode.HTML,
+			timeout: float | None = None
 		) -> tuple[bool, Exception | None]:
-		# Можно избежать блокировки потока, используя ASGI + async
 		"""
 		**ВНИМАНИЕ!!!** Блокирует поток выполнения.<br>
 		Все параметры передаются в `send_message()`, kwargs тоже.
@@ -287,7 +299,7 @@ class TelegramSendingChannel(models.Model):
 		# Не возвращаем response т.к при ошибке он будет в ex (если ошибка связана с сетью),
 		# а при успехе он нам и не нужен
 		try:
-			self.send_message(text = text, parse_mode = parse_mode, **kwargs)
+			self.send_message(text = text, parse_mode = parse_mode, timeout = timeout)
 			return (True, None)
 		except Exception as ex:
 			return (False, ex)

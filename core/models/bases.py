@@ -1,14 +1,17 @@
-from typing import Any, Self
+from logging 	import getLogger
+from typing 	import Any, Self
 
-from django.core.exceptions 			import ImproperlyConfigured
-from django.urls 						import reverse, NoReverseMatch
-from django.db 							import models
+from django.core.exceptions import ImproperlyConfigured, FieldDoesNotExist
+from django.urls 			import reverse, NoReverseMatch
+from django.db 				import models
 
-from shared.seo.og 						import OgType
-from core.models.singletons 			import SiteSettings
+from shared.reflection 		import typename
+from shared.seo.og 			import OgType
+from core.models.singletons import SiteSettings
 
-# NOTE: Может стоит придумать название лучше отражающее суть?
-# Как на счёт Page? А нынешний Page переименовать в GenericPage
+_logger = getLogger(__name__)
+
+
 class BaseRenderableModel(models.Model):
 	"""
 	Базовая модель для всех моделей, у которых будут свои detail (и опционально
@@ -31,9 +34,9 @@ class BaseRenderableModel(models.Model):
 		help_text = 'Указывайте человеко-читаемый текст. По умолчанию также '
 		'используется для HTML Title и H1.')
 	slug = models.SlugField(max_length = 128, unique = True)
-	h1 = models.CharField('H1 Заголовок', max_length = 127, blank = True,
+	_h1 = models.CharField('H1 Заголовок', max_length = 127, blank = True,
 		help_text = 'По умолчанию для H1 используется Name.')
-	html_title = models.CharField('HTML Title', max_length = 128, blank = True,
+	_html_title = models.CharField('HTML Title', max_length = 128, blank = True,
 		help_text = 'По умолчанию для HTML Title используется Name.')
 	add_sitename_to_html_title = models.BooleanField('Добавить название сайта к HTML Title?', default=True)
 	html_description = models.TextField('HTML Description', blank = True)
@@ -46,29 +49,43 @@ class BaseRenderableModel(models.Model):
 		return self.name
 
 	def get_h1(self) -> str:
-		return self.h1 or self.name
+		return self._h1 or self.name
 
 	def get_html_title(self) -> str:
 		sitename = SiteSettings.get_solo().site_name
 		return (
-			(self.html_title or self.name)
+			(self._html_title or self.name)
 			+
 			(f" | {sitename}" if self.add_sitename_to_html_title else '')
 		)
 
-	def get_html_description(self) -> str:
-		return self.html_description
+	def get_image_url(self) -> str | None:
+		FIELD_NAME = 'image'
+		try: field = self._meta.get_field(FIELD_NAME)
+		except FieldDoesNotExist:
+			return None
+
+		if not isinstance(field, models.ImageField):
+			_logger.debug(
+				f'У {typename(self)} есть поле {FIELD_NAME}, но оно не является '
+				f'{typename(models.ImageField)}, поэтому get_image_url возвращает None.'
+			)
+			return None
 
 	# Необходимо указать в дочернем классе, но можно оставить по умолчанию
-	og_type: OgType = OgType.WEBSITE
+	_OG_TYPE: OgType = OgType.WEBSITE
+
+	@property
+	def og_type(self) -> OgType:
+		return self._OG_TYPE
 
 	@property
 	def og_title(self) -> str:
 		return self.get_html_title()
 
 	@property
-	def og_description(self) -> str | None:
-		return self.get_html_description()
+	def og_description(self) -> str:
+		return self.html_description
 
 	@property
 	def og_image_url(self) -> str | None:
@@ -124,3 +141,19 @@ class BaseRenderableModel(models.Model):
 	@classmethod
 	def get_sitemap_queryset(cls):
 		return cls.objects.all()
+
+
+class OrderedModel(models.Model):
+	order = models.PositiveSmallIntegerField(default=0, db_index=True)
+	class Meta:
+		abstract = True
+		ordering = ['order']
+
+
+class UniqueNamedModel(models.Model):
+	name = models.CharField('Название', max_length = 64, unique = True)
+	class Meta:
+		abstract = True
+
+	def __str__(self):
+		return self.name

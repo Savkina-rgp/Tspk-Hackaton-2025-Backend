@@ -1,9 +1,9 @@
 from typing import Callable, Iterable
 
-from django.conf 		import settings
 from django.db.models 	import QuerySet, Model
+from django.conf 		import settings
 
-from solo.models 			import SingletonModel
+from solo.models import SingletonModel
 
 from shared.string_processing.cases import camel_to_snake_case
 from shared.reflection 				import typename
@@ -11,7 +11,6 @@ from core.models.singletons 		import *
 from core.models.general 			import Page, ExtraContext
 from core.models.bases 				import BaseRenderableModel
 
-from business import models as models
 from business import models as business
 
 def settings_context(request):
@@ -62,16 +61,14 @@ def _page_provider():
 	)
 
 def _services_provider():
-	return _queryset_to_context(
+	return _base_renderable_model_qs_to_context_as_dict(
 		business.Service.objects.all()
 	)
 
-def _categories_provider():
-	return _queryset_to_context(
-		business.Category.objects.root_nodes(),
-		'categories'
+def _articles_provider():
+	return _base_renderable_model_qs_to_context_as_dict(
+		business.Article.objects.published()
 	)
-
 
 # Я предпочёл явный список со всеми провайдерами вместо
 # декоратора, чтобы код был более понятен для фронтендеров
@@ -81,12 +78,11 @@ GLOBAL_CONTEXT_PROVIDERS: set[Callable[[], dict]] = {
 	_extra_context_provider,
 	_page_provider,
 	_services_provider,
-	_categories_provider,
+	_articles_provider,
 }
 
 SINGLETON_CLASSES_TO_GLOBAL_CONTEXT: set[type[SingletonModel]] = {
-	SiteSettings,
-	CompanyInfo
+	SiteSettings, CompanyInfo
 }
 
 def global_context(request):
