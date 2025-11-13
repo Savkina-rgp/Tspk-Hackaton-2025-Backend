@@ -1,12 +1,6 @@
-from .services 	import Service, ServiceAdvantage, PerformedServiceExample
-from .article 	import Article
-from .category 	import Category
+from .tiny_models 	import HowItsWorkItem, Parthners
+from .singletons 	import BusinessConfig
 
-# Depends on category
-from .products import (
-	Product,
-	ProductCharacteristic,
-	ProductCharacteristicType,
-	ProductAdditionalElements,
-	ProductPhoto
-)
+from .hectare_patronage import HectarePatronage, HectarePatronageBonus
+from .article 			import Article
+from .service 			import Service
