@@ -1,0 +1,757 @@
+@charset "UTF-8";
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-decoration: none;
+  border: none;
+  list-style-type: none;
+  outline: none;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+@font-face {
+  font-family: "Franklin Gothic Book";
+  src: url(/assets/fonts/ofont.ru_Franklin\ Gothic\ Book.ttf);
+  font-family: "WixMadeforDisplay";
+  src: url(/assets/fonts/WixMadeforDisplay-VariableFont_wght.ttf);
+}
+body {
+  background: rgb(255, 253, 242);
+  align-items: center;
+}
+body .btn {
+  padding: 12px;
+  background: rgb(98, 117, 87);
+  color: rgb(255, 253, 242);
+  font-family: "WixMadeforDisplay";
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 18px;
+  line-height: 120%;
+  letter-spacing: -1%;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s, transform 0.3s;
+  cursor: pointer;
+}
+body .btn a {
+  color: rgb(255, 253, 242);
+}
+body .btn:hover {
+  background: rgb(58, 69, 52);
+}
+body h1 {
+  font-family: "Franklin Gothic Book";
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 96px;
+  line-height: 114%;
+  letter-spacing: -2%;
+  text-transform: uppercase;
+  color: rgb(58, 69, 52);
+}
+body h2 {
+  font-family: "Franklin Gothic Book";
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 64px;
+  line-height: 114%;
+  letter-spacing: -2%;
+  text-transform: uppercase;
+  color: rgb(58, 69, 52);
+}
+body h3 {
+  font-family: "Franklin Gothic Book";
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 42px;
+  line-height: 114%;
+  letter-spacing: -2%;
+  text-transform: uppercase;
+  color: rgb(58, 69, 52);
+}
+body h4 {
+  font-family: "Franklin Gothic Book";
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 36px;
+  line-height: 114%;
+  letter-spacing: -2%;
+  text-transform: uppercase;
+  color: rgb(58, 69, 52);
+}
+body span {
+  color: rgb(98, 117, 87);
+}
+body p {
+  color: rgb(98, 117, 87);
+  font-family: "WixMadeforDisplay";
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 18px;
+  line-height: 120%;
+  letter-spacing: -1%;
+}
+body .big-p {
+  font-family: "WixMadeforDisplay";
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 20px;
+  line-height: 114%;
+  letter-spacing: -1.5%;
+  color: rgb(58, 69, 52);
+}
+body .card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 480px;
+  justify-content: space-between;
+}
+body .card .photo {
+  width: 480px;
+  height: 300px;
+}
+body .card .text {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+body .card .text .tags {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+body .card .text .tags .tag {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+}
+body .card .btn {
+  display: flex;
+}
+
+header {
+  display: flex;
+  padding: 36px 60px;
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 253, 242, 0.6);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+  /* Фон затемнения */
+}
+header .dec {
+  display: block;
+}
+header .mob {
+  display: none;
+}
+header .logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+}
+header .nav {
+  display: flex;
+  align-items: center;
+}
+header .nav ul {
+  display: flex;
+  gap: 32px;
+}
+header .nav ul li {
+  font-family: "WixMadeforDisplay";
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 18px;
+  line-height: 120%;
+  letter-spacing: -1%;
+  color: rgb(98, 117, 87);
+  transition: color 0.3s, transform 0.3s;
+  cursor: pointer;
+}
+header .nav ul li a {
+  font-family: "WixMadeforDisplay";
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 18px;
+  line-height: 120%;
+  letter-spacing: -1%;
+  color: rgb(98, 117, 87);
+  transition: color 0.3s, transform 0.3s;
+  cursor: pointer;
+}
+header .nav ul li a:hover {
+  color: rgb(58, 69, 52);
+}
+header .burger {
+  display: none;
+  font-size: 28px;
+  cursor: pointer;
+}
+header .overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(109, 139, 116, 0.2);
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hero-block {
+  display: flex;
+  margin-top: 100px;
+  margin-bottom: 150px;
+  position: relative;
+  width: 100%;
+  padding: 36px 60px 0 60px;
+  flex-direction: column;
+  /* текст поверх */
+}
+.hero-block .top {
+  margin-bottom: 20px;
+}
+.hero-block .hero-image-wrapper {
+  position: relative;
+  width: 100%;
+}
+.hero-block .hero-image-wrapper .forest {
+  width: 100%;
+  display: block;
+}
+.hero-block .overlay-text {
+  position: absolute;
+  bottom: -70px;
+  left: 27%;
+  width: 1400px;
+  transform: translateX(-20%);
+  transition: all 0.3s ease;
+}
+.hero-block .h-2 {
+  font-size: 90px;
+}
+.hero-block .glass h1 {
+  position: relative;
+  z-index: 1;
+  color: rgb(255, 253, 242);
+  margin: 0;
+}
+
+.memory {
+  margin: 120px 60px 120px 60px;
+  display: flex;
+  gap: 32px;
+  flex-direction: row;
+}
+.memory .description {
+  display: flex;
+  gap: 64px;
+  flex-direction: column;
+}
+.memory .description .p {
+  display: flex;
+  gap: 12px;
+}
+
+.aley {
+  margin: 120px 60px 120px 60px;
+  display: flex;
+  gap: 64px;
+  flex-direction: column;
+}
+.aley .scroll-row {
+  display: flex;
+  gap: 32px;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.aley .scroll-row::-webkit-scrollbar {
+  display: none;
+}
+.aley img {
+  width: 600px;
+  height: 500px;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.programm {
+  margin: 120px 60px 120px 60px;
+  display: flex;
+  gap: 64px;
+  flex-direction: column;
+}
+.programm .step-form {
+  display: flex;
+  flex-direction: row;
+  gap: 64px;
+  align-items: start;
+}
+.programm .steps {
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+  width: 750px;
+}
+.programm .steps hr {
+  border: 1.5px solid rgb(58, 69, 52);
+}
+.programm .steps .step {
+  display: flex;
+  gap: 20px;
+  flex-direction: row;
+}
+.programm .form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.programm .form .green {
+  width: 784px;
+  height: 478px;
+  position: absolute;
+  background: rgb(98, 117, 87);
+  z-index: 1;
+  display: flex;
+}
+.programm .form form {
+  position: relative;
+  background: rgb(255, 253, 242);
+  border: 1px solid rgb(98, 117, 87);
+  padding: 32px;
+  z-index: 2;
+  top: 24px;
+  justify-content: center;
+  flex-direction: column;
+  display: flex;
+  gap: 20px;
+}
+.programm .form form .form-row {
+  gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex-direction: row;
+  /* ——— счётчик ——— */
+}
+.programm .form form .form-row label {
+  display: flex;
+  flex-direction: column;
+  color: #2e3d32;
+  font-size: 16px;
+  gap: 6px;
+}
+.programm .form form .form-row input,
+.programm .form form .form-row select {
+  padding: 12px 16px;
+  border: 1px solid rgba(96, 113, 97, 0.4);
+  border-radius: 2px;
+  width: 320px;
+  font-size: 16px;
+  color: #2e3d32;
+  background: none;
+}
+.programm .form form .form-row input::-moz-placeholder {
+  color: #b0b0a5;
+}
+.programm .form form .form-row input::placeholder {
+  color: #b0b0a5;
+}
+.programm .form form .form-row .counter {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d8d8d8;
+  background: none;
+  justify-content: space-between;
+}
+.programm .form form .form-row .counter button {
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #2e3d32;
+}
+.programm .form form .form-row .counter input {
+  width: 60px;
+  border: none;
+  text-align: center;
+  font-size: 16px;
+  background: transparent;
+}
+
+.distance {
+  margin: 120px 60px 120px 60px;
+  display: flex;
+  gap: 72px;
+  flex-direction: row;
+}
+.distance .photo {
+  width: 800px;
+  height: 600px;
+}
+.distance .description {
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+  width: 1000px;
+}
+.distance .description .presents {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.distance .description .presents .presents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.distance .description .presents .presents-list .present {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+}
+
+.service {
+  margin: 120px 60px 120px 60px;
+  display: flex;
+  gap: 64px;
+  flex-direction: column;
+}
+.service .scroll-row {
+  display: flex;
+  gap: 32px;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.service .scroll-row::-webkit-scrollbar {
+  display: none;
+}
+.service .card {
+  scroll-snap-align: start;
+  width: 600px;
+  flex: 0 0 auto;
+  display: flex;
+  height: 610px;
+  justify-content: space-between;
+  flex-direction: column;
+}
+.service .card .photo {
+  width: 600px;
+  height: 500px;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.service .card .text {
+  gap: 16px;
+  flex-direction: column;
+}
+.service .card a {
+  width: 130px;
+}
+
+.for-the-company {
+  margin: 120px 60px 120px 60px;
+  display: flex;
+  gap: 64px;
+  flex-direction: column;
+}
+.for-the-company .for-the-company-row {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+}
+
+.history {
+  margin: 120px 60px 120px 60px;
+  display: flex;
+  gap: 64px;
+  flex-direction: column;
+}
+.history .scroll-row {
+  display: flex;
+  gap: 32px;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.history .scroll-row::-webkit-scrollbar {
+  display: none;
+}
+.history .card {
+  scroll-snap-align: start;
+  width: 600px;
+  flex: 0 0 auto;
+  display: flex;
+  height: 610px;
+  justify-content: space-between;
+  flex-direction: column;
+}
+.history .card .photo {
+  width: 600px;
+  height: 500px;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+.history .report {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+}
+.history .report video {
+  width: 800px;
+  height: 500px;
+}
+.history .report .h3 {
+  padding: 48px;
+  display: flex;
+  background: rgb(98, 117, 87);
+  text-align: right;
+  height: 220px;
+}
+.history .report .h3 h3 {
+  color: rgb(255, 253, 242);
+}
+
+.importance {
+  margin: 120px 60px 120px 60px;
+  display: flex;
+  gap: 64px;
+  flex-direction: column;
+}
+.importance .importance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 1px;
+  background-color: rgb(98, 117, 87);
+}
+.importance .importance-item {
+  background-color: rgb(255, 253, 242);
+  padding: 60px;
+}
+.importance .importance-item {
+  gap: 6px;
+  flex-direction: column;
+  display: flex;
+}
+.importance .importance-item p {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.importance .importance-item.image {
+  padding: 0;
+}
+.importance .importance-item.image img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+  display: block;
+}
+
+.how-work {
+  margin: 120px 60px 120px 60px;
+  display: flex;
+  gap: 32px;
+  flex-direction: row;
+}
+.how-work .h2-steps {
+  gap: 64px;
+  display: flex;
+  flex-direction: column;
+}
+.how-work .steps {
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+  width: 750px;
+}
+.how-work .steps hr {
+  border: 1.5px solid rgb(58, 69, 52);
+}
+.how-work .steps .step {
+  display: flex;
+  gap: 20px;
+  flex-direction: row;
+}
+.how-work .gl {
+  display: flex;
+  width: 750px;
+  height: 650px;
+}
+
+.contacs {
+  margin: 120px 60px 120px 60px;
+  display: flex;
+  gap: 32px;
+  flex-direction: column;
+}
+.contacs .contact-form {
+  display: flex;
+  flex-direction: row;
+  gap: 64px;
+}
+.contacs .contact-form .p-social {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.contacs .contact-form .p-social .socials {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+}
+.contacs .contact-form .p-social .socials .social-col {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.contacs .contact-form .p-social .socials .social-col .social {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.contacs .contact-form .p-social .socials .social-col .social img {
+  width: 32px;
+  height: 32px;
+}
+.contacs .contact-form .form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.contacs .contact-form .form .green {
+  width: 780px;
+  height: 350px;
+  position: absolute;
+  background: rgb(98, 117, 87);
+  z-index: 1;
+  display: flex;
+}
+.contacs .contact-form .form form {
+  position: relative;
+  background: rgb(255, 253, 242);
+  border: 1px solid rgb(98, 117, 87);
+  padding: 32px;
+  z-index: 2;
+  top: 32px;
+  justify-content: center;
+  flex-direction: column;
+  display: flex;
+  gap: 20px;
+}
+.contacs .contact-form .form form .form-row {
+  gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex-direction: row;
+}
+.contacs .contact-form .form form label {
+  display: flex;
+  flex-direction: column;
+  color: #2e3d32;
+  font-size: 16px;
+  gap: 6px;
+}
+.contacs .contact-form .form form input {
+  padding: 12px 16px;
+  border: 1px solid rgba(96, 113, 97, 0.4);
+  border-radius: 2px;
+  width: 320px;
+  font-size: 16px;
+  color: #2e3d32;
+  background: none;
+}
+.contacs .contact-form .form form input::-moz-placeholder {
+  color: #b0b0a5;
+}
+.contacs .contact-form .form form input::placeholder {
+  color: #b0b0a5;
+}
+
+.partnes {
+  margin: 120px 60px 120px 60px;
+  display: flex;
+  gap: 32px;
+  flex-direction: column;
+}
+.partnes .partnes-row {
+  display: flex;
+  gap: 24px;
+  flex-direction: row;
+}
+.partnes .partnes-row img {
+  width: 170px;
+}
+
+footer {
+  display: flex;
+  padding: 36px 60px;
+  width: 100%;
+  align-items: center;
+  flex-direction: column;
+  border-top: 1.5px solid rgb(98, 117, 87);
+}
+footer nav {
+  display: flex;
+  gap: 36px;
+  flex-direction: row;
+}
+footer nav ul {
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+}
+footer nav h4 {
+  color: rgb(58, 69, 52);
+}
+footer nav h4 a {
+  color: rgb(58, 69, 52);
+}
+footer nav li {
+  color: rgb(98, 117, 87);
+}
+footer nav li a {
+  color: rgb(98, 117, 87);
+}
+footer nav li .social {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+footer nav li .social img {
+  width: 32px;
+  height: 32px;
+}
+footer .polit {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+}/*# sourceMappingURL=style.css.map */
